@@ -69,6 +69,7 @@ def run_server():
     server = HTTPServer(("0.0.0.0", port), SimpleHandler)
     server.serve_forever()
 
+start_api()
 threading.Thread(target=run_server, daemon=True).start()
 
 async def main():
