@@ -1,3 +1,2 @@
-text
-   aiogram==3.13.1
-   python-dotenv
+aiogram
+python-dotenv
