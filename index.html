@@ -179,10 +179,36 @@
     </div>
 
     <script>
-        // Инициализация Telegram Web App
-        const tg = window.Telegram.WebApp;
-        tg.expand(); // Раскрываем приложение на весь экран
-        tg.ready();  // Сообщаем Telegram, что приложение готово
+    // Инициализация Telegram Web App
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.ready();
+
+    // Функция для загрузки данных с сервера
+    async function loadData() {
+        // ВАЖНО: Сюда нужно вставить вашу ссылку с Render!
+        const API_URL = "https://starosta-bot-dyvn.onrender.com"; 
+        
+        try {
+            // Загружаем статистику
+            const statsRes = await fetch(`${API_URL}/api/stats`);
+            const stats = await statsRes.json();
+            
+            // Находим зеленую цифру "12" на экране и меняем её на реальное количество студентов
+            document.querySelector('.green').innerText = stats.total;
+            
+            // Загружаем список студентов (пока просто выводим в консоль, чтобы проверить)
+            const studentsRes = await fetch(`${API_URL}/api/students`);
+            const students = await studentsRes.json();
+            console.log("Студенты в базе:", students);
+
+        } catch (error) {
+            console.error("Ошибка при загрузке данных:", error);
+        }
+    }
+
+    // Запускаем загрузку при открытии приложения
+    loadData();
     </script>
 </body>
   </html>
