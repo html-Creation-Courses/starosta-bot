@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Староста Бот</title>
+    <!-- Подключаем скрипт Telegram Mini Apps -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: #171721;
+            --card-color: #232333;
+            --text-color: #ffffff;
+            --accent-color: #6c5ce7;
+            --success-color: #00b894;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 16px;
+            padding-bottom: 80px; /* Место для нижнего меню */
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .avatar {
+            width: 48px;
+            height: 48px;
+            background-color: var(--accent-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+        .title h1 { margin: 0; font-size: 18px; }
+        .title p { margin: 4px 0 0 0; font-size: 12px; color: #888; }
+        
+        .card {
+            background-color: var(--card-color);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid #333;
+        }
+        .card-title { font-size: 14px; color: #888; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .card h2 { margin: 0 0 8px 0; font-size: 16px; }
+        .card p { margin: 0; font-size: 14px; color: #aaa; }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 16px;
+        }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 20px; font-weight: bold; }
+        .stat-label { font-size: 12px; color: #888; margin-top: 4px; }
+        .green { color: var(--success-color); }
+
+        .grid-menu {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .menu-item {
+            background-color: var(--card-color);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border: 1px solid #333;
+        }
+        .menu-item span { font-size: 12px; color: #888; margin-top: 4px; }
+
+        /* Нижнее меню */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--card-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid #333;
+            z-index: 100;
+        }
+        .nav-item {
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .nav-item.active { color: var(--accent-color); }
+        .nav-icon { font-size: 20px; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+    <!-- Шапка -->
+    <div class="header">
+        <div class="avatar">А</div>
+        <div class="title">
+            <h1>АТП-21</h1>
+            <p>УО "ГГПК"</p>
+        </div>
+    </div>
+
+    <!-- Карточка посещаемости -->
+    <div class="card">
+        <div class="card-title">Посещаемость</div>
+        <h2>Ист. Бел. Гос-ти</h2>
+        <p>15:25 – 17:05</p>
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value green">12</div>
+                <div class="stat-label">на паре</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" style="color: #f39c12;">0</div>
+                <div class="stat-label">опаздывают</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" style="color: #e74c3c;">0</div>
+                <div class="stat-label">не придут</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Сетка кнопок -->
+    <div class="card-title" style="margin-bottom: 12px; margin-left: 4px;">Быстрые действия</div>
+    <div class="grid-menu">
+        <div class="menu-item">
+            <div class="nav-icon">👥</div>
+            <strong>Студенты</strong>
+            <span>Список группы</span>
+        </div>
+        <div class="menu-item">
+            <div class="nav-icon">📅</div>
+            <strong>Расписание</strong>
+            <span>Пары, семестр</span>
+        </div>
+        <div class="menu-item">
+            <div class="nav-icon">📊</div>
+            <strong>Отчёты</strong>
+            <span>Выгрузка для деканата</span>
+        </div>
+        <div class="menu-item">
+            <div class="nav-icon">⚠️</div>
+            <strong>Прогулы</strong>
+            <span>Кто на грани</span>
+        </div>
+    </div>
+
+    <!-- Нижнее меню -->
+    <div class="bottom-nav">
+        <div class="nav-item active">
+            <div class="nav-icon">🏠</div>
+            Главная
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">👥</div>
+            Студенты
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">📅</div>
+            Расписание
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">⚙️</div>
+            Настройки
+        </div>
+    </div>
+
+    <script>
+        // Инициализация Telegram Web App
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Раскрываем приложение на весь экран
+        tg.ready();  // Сообщаем Telegram, что приложение готово
+    </script>
+</body>
+  </html>
