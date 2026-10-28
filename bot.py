@@ -1,6 +1,6 @@
 import asyncio
 import os
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import CommandStart
 from aiogram.utils.keyboard import InlineKeyboardBuilder
@@ -12,7 +12,10 @@ bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 app = FastAPI()
 
-# --- 1. API для Mini App ---
+@app.get("/")
+def read_root():
+    return {"status": "alive"}
+
 @app.get("/api/students")
 def get_students():
     db = SessionLocal()
@@ -27,11 +30,6 @@ def get_stats():
     db.close()
     return {"total": total, "present": 0, "late": 0, "absent": 0}
 
-@app.get("/")
-def read_root():
-    return {"status": "alive"}
-
-# --- 2. Логика Бота ---
 @dp.message(CommandStart())
 async def start(message: types.Message):
     db = SessionLocal()
@@ -41,7 +39,6 @@ async def start(message: types.Message):
         db.add(new_student)
         db.commit()
     db.close()
-
     builder = InlineKeyboardBuilder()
     builder.button(text="📋 Список группы", callback_data="list")
     builder.adjust(1)
@@ -53,30 +50,18 @@ async def handle_buttons(callback: types.CallbackQuery):
         db = SessionLocal()
         students = db.query(Student).all()
         db.close()
-        text = "Список группы:\n"
-        if not students:
-            text += "Пока никого нет."
-        else:
-            for i, s in enumerate(students, 1):
-                text += f"{i}. {s.full_name}\n"
+        text = "Список группы:\n" + "\n".join([f"{i}. {s.full_name}" for i, s in enumerate(students, 1)])
         await callback.message.answer(text)
     await callback.answer()
 
-# --- 3. Webhook (прием сообщений от Telegram) ---
-@app.post(f"/webhook/{BOT_TOKEN}")
-async def webhook(request: Request):
-    update = await request.json()
-    telegram_update = types.Update(**update)
-    await dp.feed_update(bot, telegram_update)
-    return {"ok": True}
-
-# --- 4. Установка Webhook при запуске ---
+# --- ЗАПУСК ВСЕГО ВНУТРИ ОДНОГО ПРОЦЕССА ---
 @app.on_event("startup")
 async def on_startup():
-    # Ваша ссылка на Render (обязательно проверьте, чтобы она была актуальной!)
-    webhook_url = f"https://starosta-bot-jdgg.onrender.com/webhook/{BOT_TOKEN}"
-    await bot.set_webhook(webhook_url, drop_pending_updates=True)
-    print(f"Webhook установлен: {webhook_url}")
+    # Удаляем старый вебхук, чтобы не было конфликта
+    await bot.delete_webhook(drop_pending_updates=True)
+    # Запускаем опрос (polling) в фоне
+    asyncio.create_task(dp.start_polling(bot))
+    print("Бот запущен в режиме Polling внутри FastAPI")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
